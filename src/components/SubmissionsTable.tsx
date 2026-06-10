@@ -53,7 +53,14 @@ const SubmissionsTable = () => {
     try {
       const res = await fetch("/api/submissions");
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "Failed to load submissions");
+      if (!res.ok) {
+        const msg = data?.detail
+          ? `${data.error}: ${data.detail}`
+          : data?.hint
+          ? `${data.error} — ${data.hint}`
+          : data?.error ?? "Failed to load submissions";
+        throw new Error(msg);
+      }
       setSubmissions(data ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load submissions.");
