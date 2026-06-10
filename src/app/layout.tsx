@@ -39,8 +39,7 @@ export default function RootLayout({
                   <span className="text-lg sm:text-2xl">🎓</span>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold leading-tight sm:text-lg truncate">AcdyOn Academic Pathway</p>
-                  <p className="hidden text-xs text-muted sm:block">Personalized academic recommendations</p>
+                  <p className="text-sm font-semibold leading-tight sm:text-lg truncate">AcdyOn</p>
                 </div>
               </Link>
 
