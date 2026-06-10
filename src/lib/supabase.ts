@@ -13,13 +13,18 @@ export interface Submission {
   created_at: string;
 }
 
+const fetchWithTimeout: typeof fetch = (url, options) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+    clearTimeout(timer)
+  );
+};
+
 export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
   {
-    global: {
-      fetch: (url, options) =>
-        fetch(url, { ...options, signal: AbortSignal.timeout(5000) }),
-    },
+    global: { fetch: fetchWithTimeout },
   }
 );
