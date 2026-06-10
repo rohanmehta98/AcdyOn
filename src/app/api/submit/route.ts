@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { supabase } from "@/lib/supabase";
 import { getAIRecommendation } from "@/lib/ai-recommendation";
-import { promises as fs } from "fs";
-import path from "path";
-import { randomUUID } from "crypto";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -54,62 +52,38 @@ export async function POST(request: Request) {
       career_goal: body.career_goal!,
     };
 
+    // Generate recommendation — AI with rules-based fallback
     const { recommendation, recommendation_reason } = await getAIRecommendation(submissionData);
 
+    // Build the response record regardless of DB outcome
+    const record = {
+      id: randomUUID(),
+      ...submissionData,
+      recommendation,
+      recommendation_reason,
+      created_at: new Date().toISOString(),
+    };
+
+    // Save to Supabase — best effort, never blocks the response
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("submissions")
-        .insert([{ ...submissionData, recommendation, recommendation_reason }])
-        .select()
-        .single();
+        .insert([{ ...submissionData, recommendation, recommendation_reason }]);
 
       if (error) {
-        console.error("Supabase insert error:", error);
-        // fall through to local fallback below
-        throw error;
+        console.error("Supabase insert error:", error.message, error.code);
       }
-
-      return NextResponse.json(data, { status: 200 });
-    } catch (supabaseErr) {
-      console.error("Supabase insert error:", supabaseErr);
-      // Attempt local fallback: write to data/local-submissions.json
-      try {
-        const fileDir = path.join(process.cwd(), "data");
-        const file = path.join(fileDir, "local-submissions.json");
-        await fs.mkdir(fileDir, { recursive: true });
-
-        let local: Record<string, unknown>[] = [];
-        try {
-          const content = await fs.readFile(file, "utf-8");
-          local = JSON.parse(content || "[]") as Record<string, unknown>[];
-        } catch {
-          local = [];
-        }
-
-        const record = {
-          id: randomUUID(),
-          ...submissionData,
-          recommendation,
-          recommendation_reason,
-          created_at: new Date().toISOString(),
-        };
-
-        local.unshift(record);
-        await fs.writeFile(file, JSON.stringify(local, null, 2), "utf-8");
-
-        return NextResponse.json(record, { status: 200 });
-      } catch (fsErr) {
-        console.error("Local fallback write error:", fsErr);
-        return NextResponse.json(
-          { error: "Unable to save submission. Please try again later." },
-          { status: 500 }
-        );
-      }
+    } catch (dbErr) {
+      console.error("Supabase unexpected error:", dbErr);
     }
+
+    // Always return the recommendation to the user
+    return NextResponse.json(record, { status: 200 });
+
   } catch (error) {
     console.error("Submit API error:", error);
     return NextResponse.json(
-      { error: "Unable to submit at this time. Please try again later." },
+      { error: "Unable to process your submission. Please try again." },
       { status: 500 }
     );
   }
