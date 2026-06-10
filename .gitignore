@@ -33,6 +33,13 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local data fallback (may contain user submissions)
+/data/
+
+# Claude / AI agent files
+.claude/
+CLAUDE.md
+
 # vercel
 .vercel
 
