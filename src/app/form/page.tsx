@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function FormPage() {
   return (
-    <div className="min-h-screen bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-100 py-6 px-3 sm:py-10 sm:px-6 lg:px-8">
       <div className="mx-auto container-lg">
 
         {/* Breadcrumb */}

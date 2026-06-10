@@ -47,11 +47,11 @@ const pathways = [
 
 export default function RecommendationSection() {
   return (
-    <div className="bg-slate-100 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto container-lg space-y-10">
+    <div className="bg-slate-100 py-6 px-3 sm:py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto container-lg space-y-6 sm:space-y-10">
 
         {/* Hero */}
-        <section className="rounded-2xl hero-bg px-6 py-12 sm:px-10 sm:py-16">
+        <section className="rounded-2xl hero-bg px-5 py-8 sm:px-10 sm:py-16">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-sky-600">
               Academic Pathway Recommendation
@@ -74,10 +74,10 @@ export default function RecommendationSection() {
         </section>
 
         {/* How it works */}
-        <section className="rounded-2xl bg-white px-6 py-10 sm:px-10 card-shadow ring-1 ring-slate-200">
-          <h2 className="text-2xl font-bold text-slate-900">How it works</h2>
-          <p className="mt-2 text-slate-500">Three simple steps to your personalised recommendation.</p>
-          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+        <section className="rounded-2xl bg-white px-5 py-8 sm:px-10 sm:py-10 card-shadow ring-1 ring-slate-200">
+          <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">How it works</h2>
+          <p className="mt-1 text-sm text-slate-500 sm:mt-2 sm:text-base">Three simple steps to your personalised recommendation.</p>
+          <div className="mt-6 grid gap-5 sm:mt-8 sm:grid-cols-3">
             {steps.map((step) => (
               <div key={step.number} className="flex flex-col gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-sm font-black text-white shadow-md">
@@ -91,10 +91,10 @@ export default function RecommendationSection() {
         </section>
 
         {/* Pathways */}
-        <section className="rounded-2xl bg-white px-6 py-10 sm:px-10 card-shadow ring-1 ring-slate-200">
-          <h2 className="text-2xl font-bold text-slate-900">Possible Pathways</h2>
-          <p className="mt-2 text-slate-500">Your profile is matched against four academic pathways.</p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="rounded-2xl bg-white px-5 py-8 sm:px-10 sm:py-10 card-shadow ring-1 ring-slate-200">
+          <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">Possible Pathways</h2>
+          <p className="mt-1 text-sm text-slate-500 sm:mt-2 sm:text-base">Your profile is matched against four academic pathways.</p>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-4">
             {pathways.map((p) => (
               <div key={p.label} className={`rounded-xl border px-4 py-5 ${p.color}`}>
                 <div className="flex items-center gap-2 mb-2">
@@ -108,7 +108,7 @@ export default function RecommendationSection() {
         </section>
 
         {/* CTA bottom */}
-        <section className="rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 px-6 py-10 sm:px-10 text-white text-center">
+        <section className="rounded-2xl bg-gradient-to-r from-sky-600 to-indigo-600 px-5 py-8 sm:px-10 sm:py-10 text-white text-center">
           <h2 className="text-2xl font-bold">Ready to find your path?</h2>
           <p className="mt-2 text-sky-100">Takes less than 2 minutes. No account required.</p>
           <div className="mt-6">
