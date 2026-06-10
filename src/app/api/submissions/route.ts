@@ -1,26 +1,22 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  // Surface missing env vars clearly
-  if (!url || !key) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json(
-      { error: "SUPABASE_ENV_MISSING", detail: `URL: ${!!url}, KEY: ${!!key}` },
+      { error: "SUPABASE_ENV_MISSING: check Vercel environment variables" },
       { status: 500 }
     );
   }
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("submissions")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Supabase fetch error:", error);
+      console.error("Supabase fetch error:", error.message, error.code);
       return NextResponse.json(
         { error: error.message, code: error.code, hint: error.hint },
         { status: 500 }

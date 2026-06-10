@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { supabase } from "@/lib/supabase";
+import { supabaseAdmin } from "@/lib/supabase";
 import { getAIRecommendation } from "@/lib/ai-recommendation";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
 
     // Save to Supabase — best effort, never blocks the response
     try {
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from("submissions")
         .insert([{ ...submissionData, recommendation, recommendation_reason }]);
 
