@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
@@ -30,15 +31,8 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — never commit secrets
 .env*
-
-# local data fallback (may contain user submissions)
-/data/
-
-# Claude / AI agent files
-.claude/
-CLAUDE.md
 
 # vercel
 .vercel
@@ -46,3 +40,16 @@ CLAUDE.md
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local data fallback (may contain real user submissions)
+/data/
+
+# Claude / AI agent config files
+CLAUDE.md
+AGENTS.md
+.claude/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
