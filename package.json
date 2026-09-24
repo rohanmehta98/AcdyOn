@@ -1,8 +1,11 @@
 {
-  "name": "acdyon-academic-pathway",
-  "engines": { "node": ">=20" },
-  "version": "0.1.0",
+  "name": "acdyon",
+  "version": "1.0.0",
   "private": true,
+  "description": "AcdyOn: AI career advisor for India. Ask about any career or take a quick quiz and get a detailed, personalised career plan.",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,7 +13,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.108.1",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4"

@@ -1,114 +1,85 @@
-# AcdyOn Academic Pathway Recommendation Engine
+# AcdyOn: AI Career Advisor for India
 
-An AI-powered web application that analyses a user's academic background and career goals, then recommends the most suitable academic pathway — Certification Program, DBA, PhD, or Honorary Doctorate.
+AcdyOn gives students and professionals in India detailed, personalised career guidance on a clear dashboard, not in a chat window.
 
-Built for the **AcdyOn Technical Internship Challenge**.
+It has two ways in:
 
-## Features
+- **Ask about any career.** Type any question in your own words, like "How do I become an IAS officer?", "CA vs MBA after B.Com" or "Is data science a good career in India?". You get a full career guide: a short answer, salaries in ₹ LPA, demand and AI risk, the exams and ways to get in, a roadmap, courses, pros and cons, related careers and FAQs. Add your background and it also shows a personal fit score.
+- **Take the 2-minute quiz.** Four simple tap-to-choose steps. You get your top 4 career matches with fit scores, a skill-gap check, a 12-month roadmap, courses that fit your budget, portfolio projects, quick wins and alternative paths.
 
-- AI-powered recommendations via **Groq (Llama 3.1)** with automatic rules-based fallback
-- Multi-step form with real-time validation
-- Submissions stored in **Supabase**
-- Admin dashboard at `/submissions` with search and filter
-- Fully responsive, mobile-friendly UI
-- Loading states and comprehensive error handling
+**Privacy:** nothing is stored. There is no database and no login. Your answers are sent to the AI once to build your report, then discarded.
 
-## Tech Stack
+## Tech stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS v4 |
-| Database | Supabase (PostgreSQL) |
-| AI / Recommendations | Groq API — Llama 3.1 8B Instant |
-| Deployment | Vercel |
+- [Next.js 16](https://nextjs.org) (App Router) with React 19 and TypeScript
+- Tailwind CSS v4
+- [Groq](https://groq.com) for AI (`openai/gpt-oss-120b` by default, falling back automatically to other models)
+- No other runtime dependencies
 
-## Getting Started
+## Getting started
 
-### 1. Install dependencies
+Requires Node.js 20 or newer.
 
 ```bash
+git clone https://github.com/rohanmehta98/AcdyOn.git
+cd AcdyOn
 npm install
-```
-
-### 2. Configure environment variables
-
-Create a `.env.local` file in the project root:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-GROQ_API_KEY=your_groq_api_key
-```
-
-- **Supabase** — create a free project at [supabase.com](https://supabase.com)
-- **Groq** — get a free API key at [console.groq.com](https://console.groq.com)
-
-### 3. Set up the Supabase table
-
-Run this SQL in your Supabase SQL editor:
-
-```sql
-create table submissions (
-  id uuid primary key default gen_random_uuid(),
-  full_name text not null,
-  email text not null,
-  highest_qualification text not null,
-  years_of_experience integer not null,
-  current_profession text not null,
-  career_goal text not null,
-  recommendation text not null,
-  recommendation_reason text not null,
-  created_at timestamptz default now()
-);
-```
-
-### 4. Run the development server
-
-```bash
+cp .env.example .env.local   # then add your Groq API key
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Then open http://localhost:3000.
 
-## Project Structure
+### Environment variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GROQ_API_KEY` | Yes | Free key from https://console.groq.com/keys |
+| `GROQ_MODEL` | No | Overrides the default AI model |
+
+The key is only used on the server and is never sent to the browser. Never commit `.env.local`.
+
+## How it works
 
 ```
 src/
 ├── app/
-│   ├── api/
-│   │   ├── submit/route.ts       # POST — generate & store recommendation
-│   │   └── submissions/route.ts  # GET — fetch all submissions
-│   ├── form/page.tsx             # Recommendation form page
-│   ├── submissions/page.tsx      # Admin submissions dashboard
-│   ├── layout.tsx                # Root layout with nav & footer
-│   ├── page.tsx                  # Homepage
-│   └── globals.css
+│   ├── page.tsx                 # Home page
+│   ├── api/explore/route.ts     # "Ask about any career" endpoint
+│   └── api/recommend/route.ts   # Quiz endpoint
 ├── components/
-│   ├── Form.tsx                  # Multi-field form with validation & result card
-│   ├── RecommendationSection.tsx # Hero, How it works, Pathways sections
-│   └── SubmissionsTable.tsx      # Filterable, searchable submissions table
+│   ├── Advisor.tsx              # Landing page, loading state, switches between views
+│   ├── CareerForm.tsx           # 4-step quiz
+│   ├── GuideView.tsx            # Dashboard for a career question
+│   ├── Dashboard.tsx            # Dashboard for quiz results
+│   └── ui.tsx                   # Shared UI pieces
 └── lib/
-    ├── ai-recommendation.ts      # Groq AI call with rules-based fallback
-    ├── recommendation.ts         # Rules-based recommendation engine
-    └── supabase.ts               # Supabase client + Submission type
+    ├── advisor.ts               # Quiz logic and prompt
+    ├── explore.ts               # Career-question logic and prompt
+    ├── india.ts                 # Indian context shared by both prompts
+    ├── groq.ts                  # Groq client, retries, model fallback, output cleanup
+    └── types.ts                 # Shared types and quiz options
 ```
 
-## Recommendation Logic
+The recommendation logic works in three layers:
 
-The AI is prompted with the user's qualification, experience, profession, and career goal. It selects from four pathways:
+1. **Rule-based pre-analysis.** Before calling the AI, the server works out the person's career stage, whether this is a career switch, and a realistic study capacity based on their situation and timeline. For career questions, it detects what kind of question was asked (how to get in, comparison, outlook, salary or career switch) so the answer focuses on that.
+2. **AI generation.** Groq is asked for strict JSON under clear rules: Indian salaries and costs in ₹, real Indian exams, colleges and platforms, respect for the person's budget, and honest scores. The user's text is treated only as data, so it can't override these rules, and questions that aren't about careers get a polite redirect.
+3. **Validation.** Every AI response is cleaned up before it reaches the dashboard: scores are kept within 0–100, careers are sorted, and missing fields get safe defaults, so the UI never breaks. Failed calls are retried, and if Groq retires a model the app switches to the next one automatically.
 
-| Pathway | Typical Profile |
+## Scripts
+
+| Command | What it does |
 |---|---|
-| Certification Program | Early-career; skill-gap; practical credential needed |
-| DBA | 5+ years experience; business/leadership goals |
-| PhD | Research-oriented goals; Master's or above |
-| Honorary Doctorate | 20+ years; distinguished career contributions |
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build |
+| `npm start` | Run the production build |
+| `npm run lint` | Run ESLint |
 
-If the Groq API is unavailable or the key is not set, the app falls back to the built-in rules engine automatically.
+## Deploying
 
-## Deployment
+Deploy to [Vercel](https://vercel.com) or any Node.js host, and set `GROQ_API_KEY` in the project's environment variables.
 
-The app is configured for one-click deployment on **Vercel**. Set the four environment variables in the Vercel dashboard under Project → Settings → Environment Variables.
+## Disclaimer
+
+AcdyOn gives AI-generated guidance. Salaries, exam details and requirements are estimates, so check them with official sources before making big decisions.

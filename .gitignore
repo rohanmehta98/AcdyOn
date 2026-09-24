@@ -31,8 +31,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files — never commit secrets
+# env files — never commit secrets (the example file has no real values)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -41,7 +42,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local data fallback (may contain real user submissions)
+# local data
 /data/
 
 # Claude / AI agent config files
